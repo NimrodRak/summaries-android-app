@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Summaries</string>
+    <string name="default_notification_channel_id">notifications_channel</string>
+    <string name="notifications_channel_name">summaries_updates</string>
+    <string name="notification_title_key">title</string>
+    <string name="notification_text_key">text</string>
+    <string name="course_row_format">%s (%s)</string>
+    <string name="shared_prefs_courses_list">courseslist</string>
+    <string name="url_clipboard_label">Summary Link</string>
+    <string name="clipboard_copied_toast_message">Copied summary URL to clipboard</string>
+    <string name="remote_url">https://pastebin.com/raw/HUwDMSfr</string>
+</resources>
