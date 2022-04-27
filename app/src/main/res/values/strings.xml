@@ -5,8 +5,12 @@
     <string name="notification_title_key">title</string>
     <string name="notification_text_key">text</string>
     <string name="course_row_format">%s (%s)</string>
-    <string name="shared_prefs_courses_list">courseslist</string>
+    <string name="shared_prefs_courses_list">coursesList</string>
     <string name="url_clipboard_label">Summary Link</string>
     <string name="clipboard_copied_toast_message">Copied summary URL to clipboard</string>
     <string name="remote_url">https://pastebin.com/raw/HUwDMSfr</string>
+    <string name="app_help">כדי להירשם להתראות לקורס כלשהו, לחצו על הכפתור משמאל.\nלחיצה קצרה על שם הקורס תפתח את הסיכום ולחיצה ארוכה תעתיק את הקישור שלו לקליפבורד שלכם.\   \n \nשימו לב: הקישורים עובדים גם בקורסים שלא ניתן להירשם להתראות עבורם.
+    </string>
+    <string name="toolbar_button_description">הנחיות</string>
+    <string name="summaries_toolbar_name">Summaries</string>
 </resources>

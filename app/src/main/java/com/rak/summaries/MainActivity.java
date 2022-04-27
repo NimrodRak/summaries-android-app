@@ -1,10 +1,16 @@
 package com.rak.summaries;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.Html;
+import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,13 +20,26 @@ import java.util.Scanner;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity {
-    private static final String COMMA_DELIM = ", ";
+    private static final String COMMA_DELIMITER = ", ";
+    private static final String REMOTE_URL = "https://pastebin.com/raw/HUwDMSfr";
+    private static final int HELP_SNACKBAR_DURATION = 15_000;
+
     private CoursesAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ((TextView)findViewById(R.id.archive_info)).setText(Html.fromHtml(""));
+
+        // set help button listener
+        findViewById(R.id.info_button).setOnClickListener(view -> {
+            @SuppressLint("WrongConstant") Snackbar snackbar = Snackbar.make(view, R.string.app_help, HELP_SNACKBAR_DURATION);
+            TextView textView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+            textView.setMaxLines(10);  // show multiple line
+            textView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+            snackbar.show();
+        });
 
         // attach adapter
         adapter = new CoursesAdapter(this, new ArrayList<>());
@@ -47,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
      * get courses from remote
      * @return arraylist of courses
      */
-    public ArrayList<Course> getRemoteCourses() {
+    public static ArrayList<Course> getRemoteCourses() {
         try {
-            InputStream remoteStream = new URL(getApplicationContext().getString(R.string.remote_url))
+            InputStream remoteStream = new URL(REMOTE_URL)
                     .openConnection()
                     .getInputStream();
 
@@ -58,11 +77,12 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<Course> courses = new ArrayList<>();
             while (scanner.hasNext()) {
                 String row = scanner.nextLine();
-                String[] elems = row.split(COMMA_DELIM);
+                String[] elements = row.split(COMMA_DELIMITER);
                 courses.add(new Course(
-                        elems[1],
-                        elems[2],
-                        elems[0]
+                        elements[1],
+                        elements[2],
+                        elements[0],
+                        elements[3].equals("1")
                 ));
             }
             return courses;

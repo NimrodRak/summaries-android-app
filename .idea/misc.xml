@@ -3,9 +3,18 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/dev/Summaries/app/src/main/res/drawable-anydpi/ic_info_toolbar.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/drawable/ic_launcher_sletter_foreground.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/drawable/ic_online.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout-v26/activity_main.xml" value="0.1" />
         <entry key="..\:/dev/Summaries/app/src/main/res/layout-v26/course_row.xml" value="0.14130434782608695" />
-        <entry key="..\:/dev/Summaries/app/src/main/res/layout/activity_main.xml" value="0.22" />
-        <entry key="..\:/dev/Summaries/app/src/main/res/layout/course_row.xml" value="0.22" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/actionbar.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/bottom_up.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/coordinator.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/course_row.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/snackbar_info.xml" value="0.1" />
       </map>
     </option>
   </component>

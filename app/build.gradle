@@ -9,8 +9,8 @@ android {
         applicationId "com.rak.summaries"
         minSdk 23
         targetSdk 31
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -19,6 +19,7 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            debuggable false
         }
     }
     compileOptions {
@@ -39,7 +40,6 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:29.3.1')
 
     implementation 'com.google.firebase:firebase-analytics'
-
     implementation 'com.google.code.gson:gson:2.8.7'
 }
 

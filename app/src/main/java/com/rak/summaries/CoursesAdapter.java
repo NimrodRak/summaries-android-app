@@ -33,6 +33,63 @@ public class CoursesAdapter extends ArrayAdapter<Course> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.course_row, parent, false);
         }
         applyCourseDetails(course, convertView);
+        setCourseListeners(convertView, course);
+        setSwitchListeners(convertView, course);
+        return convertView;
+    }
+
+    /**
+     * sets listeners or disables switch
+     * @param convertView view with switch
+     * @param course course data
+     */
+    private void setSwitchListeners(@NonNull View convertView, Course course) {
+        if (course.getActive()) {
+            // set on (un)subscribe when switch fires
+            ((SwitchMaterial) convertView.findViewById(R.id.switch1)).setOnCheckedChangeListener((compoundButton, b) -> {
+                if (!compoundButton.isPressed()) {
+                    return;
+                }
+                if (b) {
+                    // subscribe from FCM topic
+                    FirebaseMessaging.getInstance()
+                            .subscribeToTopic(course.getNumber());
+                    // remove subscription from preferences
+                    getContext().getSharedPreferences(getContext()
+                            .getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
+                            .edit()
+                            .putBoolean(course.getNumber(), true)
+                            .apply();
+                } else {
+                    // unsubscribe from FCM topic
+                    FirebaseMessaging.getInstance()
+                            .unsubscribeFromTopic(course.getNumber());
+                    // insert subscription from preferences
+                    getContext().getSharedPreferences(getContext()
+                            .getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
+                            .edit()
+                            .remove(course.getNumber())
+                            .apply();
+                }
+            });
+            // apply saved preferences to subscription
+            boolean isSubscribed = getContext()
+                    .getSharedPreferences(getContext().getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
+                    .getBoolean(course.getNumber(), false);
+            ((SwitchMaterial) convertView.findViewById(R.id.switch1))
+                    .setChecked(isSubscribed);
+        }
+        else {
+            convertView.findViewById(R.id.switch1).setEnabled(false);
+        }
+    }
+
+    /**
+     * set click and long click listeners
+     * @param convertView view with text
+     * @param course course data
+     */
+    private void setCourseListeners(@NonNull View convertView, Course course) {
         // set on (long) click listeners for text view
         convertView.findViewById(R.id.textView).setOnClickListener(view -> {
             Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -50,36 +107,13 @@ public class CoursesAdapter extends ArrayAdapter<Course> {
                     () -> ((MainActivity) getContext()).toastMessage(getContext().getString(R.string.clipboard_copied_toast_message)));
             return true;
         });
-        // set on (un)subscribe when switch fires
-        ((SwitchMaterial) convertView.findViewById(R.id.switch1)).setOnCheckedChangeListener((compoundButton, b) -> {
-            if (b) {
-                // subscribe from FCM topic
-                FirebaseMessaging.getInstance().subscribeToTopic(course.getNumber());
-                // remove subscription from preferences
-                getContext().getSharedPreferences(getContext()
-                        .getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
-                        .edit()
-                        .putBoolean(course.getNumber(), true)
-                        .apply();
-            } else {
-                // unsubscribe from FCM topic
-                FirebaseMessaging.getInstance().unsubscribeFromTopic(course.getNumber());
-                // insert subscription from preferences
-                getContext().getSharedPreferences(getContext()
-                        .getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
-                        .edit()
-                        .remove(course.getNumber())
-                        .apply();
-            }
-        });
-        // apply saved preferences to subscription
-        ((SwitchMaterial) convertView.findViewById(R.id.switch1))
-                .setChecked(getContext()
-                        .getSharedPreferences(getContext().getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
-                        .getBoolean(course.getNumber(), false));
-        return convertView;
     }
 
+    /**
+     * puts course data in list item
+     * @param course course data
+     * @param view list item
+     */
     private void applyCourseDetails(Course course, View view) {
         // set the text of the textview based on the course data
         ((TextView) view.findViewById(R.id.textView)).setText(String.format(

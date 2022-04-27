@@ -48,7 +48,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String topic = splitTopic[splitTopic.length - 1];
 
         // get courses from remote
-        ArrayList<Course> courses = ((MainActivity)getApplicationContext()).getRemoteCourses();
+        ArrayList<Course> courses = MainActivity.getRemoteCourses();
         if (courses == null) {
             return;
         }
