@@ -4,6 +4,10 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/dev/Summaries/app/src/main/res/drawable-anydpi/ic_info_toolbar.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/drawable-anydpi/ic_subbed.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/drawable/activated_rainbow.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/drawable/ic_drive2_foreground.xml" value="0.125" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/drawable/ic_drive_background.xml" value="0.125" />
         <entry key="..\:/dev/Summaries/app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
         <entry key="..\:/dev/Summaries/app/src/main/res/drawable/ic_launcher_sletter_foreground.xml" value="0.1" />
         <entry key="..\:/dev/Summaries/app/src/main/res/drawable/ic_online.xml" value="0.1" />
@@ -14,7 +18,11 @@
         <entry key="..\:/dev/Summaries/app/src/main/res/layout/bottom_up.xml" value="0.1" />
         <entry key="..\:/dev/Summaries/app/src/main/res/layout/coordinator.xml" value="0.1" />
         <entry key="..\:/dev/Summaries/app/src/main/res/layout/course_row.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/group_item.xml" value="0.184375" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/list_group.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/layout/list_item.xml" value="0.13903985507246377" />
         <entry key="..\:/dev/Summaries/app/src/main/res/layout/snackbar_info.xml" value="0.1" />
+        <entry key="..\:/dev/Summaries/app/src/main/res/mipmap-anydpi-v26/ic_drive2.xml" value="0.125" />
       </map>
     </option>
   </component>

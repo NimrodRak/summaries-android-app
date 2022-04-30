@@ -1,53 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        tools:context=".MainActivity"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:context=".MainActivity">
 
         <com.google.android.material.appbar.AppBarLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar2"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/toolbar2"
                 android:layout_gravity="end"
-                android:elevation="15dp"
                 android:background="?colorOnPrimary"
+                android:elevation="15dp"
                 android:minHeight="?attr/actionBarSize">
 
                 <RelativeLayout
-                    android:layout_height="wrap_content"
-                    android:layout_width="match_parent">
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
 
                     <ImageButton
                         android:id="@+id/info_button"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginEnd="10dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:contentDescription="@string/toolbar_button_description"
-                        android:layout_centerVertical="true"
                         android:layout_alignParentEnd="true"
-                        app:backgroundTint="?dividerColor"
-                        android:background="@drawable/ic_info_toolbar" />
+                        android:layout_centerVertical="true"
+                        android:layout_marginTop="5dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:background="@drawable/ic_info_toolbar"
+                        android:contentDescription="@string/toolbar_button_description"
+                        app:backgroundTint="?dividerColor" />
 
                     <TextView
-                        android:textSize="25sp"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_centerVertical="true"
                         android:text="@string/summaries_toolbar_name"
-                        />
+                        android:textSize="25sp" />
                 </RelativeLayout>
             </androidx.appcompat.widget.Toolbar>
         </com.google.android.material.appbar.AppBarLayout>
@@ -56,22 +54,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="5dp"
-                android:textAlignment="textStart"
-                android:id="@+id/archive_info"
-                 />
-
-            <ListView
+            <com.rak.summaries.AnimatedExpandableListView
                 android:id="@+id/listView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="10dp"
-                android:scrollbarSize="0dp"
-                android:scrollingCache="true"
-                android:divider="@null" />
+                android:layoutDirection="rtl"
+                android:textDirection="rtl" />
+
         </RelativeLayout>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

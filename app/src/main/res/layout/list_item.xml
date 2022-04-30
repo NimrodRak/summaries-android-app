@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layoutDirection="rtl"
+    android:orientation="horizontal"
+    android:layout_gravity="center"
+>
+    <ImageButton
+        android:id="@+id/courseLink"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/courseOpen"
+        android:contentDescription="העתקת קישור"
+        android:layout_marginHorizontal="10dp"
+        android:background="@drawable/ic_link2"
+        android:backgroundTint="?dividerColor"
+        />
+
+    <ImageButton
+        android:id="@+id/courseOpen"
+        android:layout_centerVertical="true"
+        android:layout_marginHorizontal="10dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+
+        android:padding="0dp"
+        android:layout_centerHorizontal="true"
+
+        android:scaleType="fitCenter"
+        android:background="@mipmap/ic_drive_trans_foreground"
+        android:contentDescription="פתיחה ב-Google Drive" />
+
+    <ImageButton
+        android:id="@+id/courseSub"
+        android:contentDescription="הרשמה להתראות"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:scaleType="fitCenter"
+        android:background="@drawable/ic_subbed"
+        android:backgroundTint="?dividerColor"
+        android:layout_centerVertical="true"
+        android:layout_marginHorizontal="10dp"
+        android:layout_toEndOf="@+id/courseOpen" />
+
+</RelativeLayout>
