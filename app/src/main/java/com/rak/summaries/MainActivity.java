@@ -6,7 +6,6 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -16,9 +15,11 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,9 +34,12 @@ import java.util.concurrent.Executors;
 public class MainActivity extends AppCompatActivity {
     private static final String COMMA_DELIMITER = ", ";
     private static final String REMOTE_URL = "https://pastebin.com/raw/HUwDMSfr";
-    private static final int HELP_SNACKBAR_DURATION = 15_000;
+    private static final int HELP_SNACK_BAR_DURATION = 35_000;
+    private static final String ACTIVE_SUFFIX = "2";
+    public static final String TEST_TOPIC = "test";
+    public static final String TEST_TOPIC_SUB_MSG = "Subscribed to testing topic.";
     private AnimatedExpandableListView listView;
-    private ExampleAdapter adapter;
+    private CourseAdapter adapter;
     ArrayList<Course> courses;
     private final ArrayDeque<Integer> previousGroups = new ArrayDeque<>();
 
@@ -45,17 +49,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         listView = (AnimatedExpandableListView) findViewById(R.id.listView);
-        adapter = new ExampleAdapter(this);
-
+        adapter = new CourseAdapter(this);
 
         listView.setOnGroupClickListener((parent, v, groupPosition, id) -> {
             // if closing tab, close it and remove it from the to be removed list
             if (listView.isGroupExpanded(groupPosition)) {
                 listView.collapseGroupWithAnimation(groupPosition);
                 previousGroups.removeFirstOccurrence(groupPosition);
-                // if opening, close all other ones
             } else {
-
+                // if opening, close all other ones
                 listView.expandGroupWithAnimation(groupPosition);
                 while (!previousGroups.isEmpty()) {
                     listView.collapseGroupWithAnimation(Objects.requireNonNull(previousGroups.peek()));
@@ -67,20 +69,41 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
-        // set help button listener
-        findViewById(R.id.info_button).setOnClickListener(view -> {
-            @SuppressLint("WrongConstant") Snackbar snackbar = Snackbar.make(view, R.string.app_help, HELP_SNACKBAR_DURATION);
-            TextView textView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
-            textView.setMaxLines(10);  // show multiple line
-            textView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
-            snackbar.show();
-        });
+        setClickListeners();
 
         // get courses from remote
         Executors.newSingleThreadExecutor().execute(this::generateAdapter);
     }
 
+    private void setClickListeners() {
+        // set help button listener
+        findViewById(R.id.info_button).setOnClickListener(view -> {
+            @SuppressLint("WrongConstant") Snackbar snackbar = Snackbar.make(view, R.string.app_help, HELP_SNACK_BAR_DURATION);
+            TextView textView = snackbar.getView().findViewById(com.google.android.material.R.id.snackbar_text);
+            textView.setMaxLines(10);  // show multiple lines
+            textView.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_START);
+            snackbar.show();
+        });
+
+        // set developer options button listener
+        findViewById(R.id.app_name).setOnLongClickListener(view -> {
+            FirebaseMessaging.getInstance().subscribeToTopic(TEST_TOPIC);
+            toastMessage(TEST_TOPIC_SUB_MSG);
+            return true;
+        });
+    }
+
+    @NonNull
+    private static Scanner getCoursesScanner() throws IOException {
+        InputStream remoteStream = new URL(REMOTE_URL)
+                .openConnection()
+                .getInputStream();
+        // read line by line the remote and parse them as courses
+        return new Scanner(remoteStream);
+    }
+
     private void generateAdapter() {
+        setDriveFolderListener();
         courses = getRemoteCourses();
         List<GroupItem> items = new ArrayList<>(Objects.requireNonNull(courses).size());
         // Populate our list with groups and it's children
@@ -93,20 +116,36 @@ public class MainActivity extends AppCompatActivity {
 
             items.add(item);
 
-            getSharedPreferences(getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
-                    .edit()
-                    .putBoolean(course.getNumber() + "2", course.getActive())
-                    .apply();
+            setCourseData(course.getNumber() + ACTIVE_SUFFIX, course.getActive());
         }
 
         adapter.setData(items);
-        runOnUiThread(() -> {
-            listView.setAdapter(adapter);
-
-
-        });
+        runOnUiThread(() -> listView.setAdapter(adapter));
     }
 
+    private void setCourseData(String number, boolean value) {
+        getSharedPreferences(getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean(number, value)
+                .apply();
+    }
+
+    private void setDriveFolderListener() {
+        try {
+            Scanner scanner = getCoursesScanner();
+            if (scanner.hasNext()) {
+                String url = scanner.nextLine();
+                findViewById(R.id.drive_button).setOnClickListener(view -> {
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(url));
+
+                    MainActivity.this.startActivity(intent);
+                });
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * get courses from remote
@@ -115,13 +154,10 @@ public class MainActivity extends AppCompatActivity {
      */
     public static ArrayList<Course> getRemoteCourses() {
         try {
-
-            InputStream remoteStream = new URL(REMOTE_URL)
-                    .openConnection()
-                    .getInputStream();
-
-            // read line by line the remote and parse them as courses
-            Scanner scanner = new Scanner(remoteStream);
+            Scanner scanner = getCoursesScanner();
+            if (scanner.hasNext()) {
+                scanner.nextLine();
+            }
             ArrayList<Course> courses = new ArrayList<>();
             while (scanner.hasNext()) {
                 String row = scanner.nextLine();
@@ -182,12 +218,12 @@ public class MainActivity extends AppCompatActivity {
         TextView title;
     }
 
-    private class ExampleAdapter extends AnimatedExpandableListView.AnimatedExpandableListAdapter {
+    private class CourseAdapter extends AnimatedExpandableListView.AnimatedExpandableListAdapter {
         private final LayoutInflater inflater;
         private List<GroupItem> items;
         private int prev;
 
-        public ExampleAdapter(Context context) {
+        public CourseAdapter(Context context) {
             inflater = LayoutInflater.from(context);
         }
 
@@ -220,6 +256,21 @@ public class MainActivity extends AppCompatActivity {
                 holder = (ChildHolder) convertView.getTag();
             }
 
+            setItemClickListeners(groupPosition, parent, holder, item);
+
+            // set color on load if already subbed
+            holder.courseSub.setBackgroundTintList(getColorStateList(isSubbed(item)
+                    ? R.color.activated_sub : R.color.deactivated_sub));
+            // set visibility if not active
+            holder.courseSub.setVisibility(isActive(item)
+                    ? View.VISIBLE : View.GONE);
+
+            notifyDataSetChanged();
+
+            return convertView;
+        }
+
+        private void setItemClickListeners(int groupPosition, ViewGroup parent, ChildHolder holder, ChildItem item) {
             holder.courseOpen.setOnClickListener(view -> {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(item.link));
@@ -238,37 +289,29 @@ public class MainActivity extends AppCompatActivity {
                                 .toastMessage(getApplicationContext()
                                         .getString(R.string.clipboard_copied_toast_message)));
             });
-            holder.courseSub.setBackgroundTintList(getColorStateList(isSubbed(item)
-                    ? R.color.activated_sub : R.color.deactivated_sub));
-            holder.courseSub.setVisibility(isActive(item)
-                    ? View.VISIBLE : View.GONE);
-
             holder.courseSub.setOnClickListener(view -> {
                 boolean isSubscribed = isSubbed(item);
+                // activate color if we haven't been subbed until now, otherwise deactivated
                 holder.courseSub.setBackgroundTintList(getColorStateList(
                         !isSubscribed ? R.color.activated_sub : R.color.deactivated_sub));
-                if (isSubscribed) {
+                // return to previous color if we were subbed and now not
+                if (isSubscribed && isActive(item)) {
                     ((TextView) parent.getChildAt(groupPosition).findViewById(R.id.textTitle)).setTextColor(prev);
+                    FirebaseMessaging.getInstance().unsubscribeFromTopic(item.number);
                 } else {
-
                     ((TextView) parent.getChildAt(groupPosition).findViewById(R.id.textTitle)).setTextColor(getResources().getColor(R.color.activated_sub, getTheme()));
+                    FirebaseMessaging.getInstance().subscribeToTopic(item.number);
                 }
-                getSharedPreferences(getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
-                        .edit()
-                        .putBoolean(item.number, !isSubscribed)
-                        .apply();
+                // update course subscription accordingly
+                setCourseData(item.number, !isSubscribed);
                 notifyDataSetChanged();
             });
-            notifyDataSetChanged();
-
-
-            return convertView;
         }
 
         private boolean isActive(ChildItem item) {
             return getSharedPreferences(
                     getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
-                    .getBoolean(item.number + "2", false);
+                    .getBoolean(item.number + ACTIVE_SUFFIX, false);
         }
 
         private boolean isSubbed(ChildItem item) {
@@ -276,7 +319,6 @@ public class MainActivity extends AppCompatActivity {
                     getString(R.string.shared_prefs_courses_list), Context.MODE_PRIVATE)
                     .getBoolean(item.number, false);
         }
-
 
         @Override
         public int getRealChildrenCount(int groupPosition) {
@@ -313,8 +355,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             holder.title.setText(item.title);
+            // save it for retrieval - this is overridden by ALL subbed courses,
+            // assumes they are also the same color
             prev = holder.title.getCurrentTextColor();
-            if (isSubbed(getChild(groupPosition, 0))) {
+            // if it is subbed we apply the activated color
+            if (isSubbed(getChild(groupPosition, 0)) && isActive(getChild(groupPosition, 0))) {
                 holder.title.setTextColor(getResources().getColor(R.color.activated_sub, getTheme()));
             }
 
@@ -330,6 +375,5 @@ public class MainActivity extends AppCompatActivity {
         public boolean isChildSelectable(int arg0, int arg1) {
             return true;
         }
-
     }
 }

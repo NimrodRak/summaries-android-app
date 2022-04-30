@@ -18,14 +18,10 @@ package com.rak.summaries;
  */
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.SparseArray;
 import android.view.View;
@@ -37,6 +33,9 @@ import android.widget.AbsListView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class defines an ExpandableListView which supports animations for
@@ -151,14 +150,13 @@ public class AnimatedExpandableListView extends ExpandableListView {
      * Expands the given group with an animation.
      *
      * @param groupPos The position of the group to expand
-     * @return Returns true if the group was expanded. False if the group was
-     * already expanded.
      */
     @SuppressLint("NewApi")
-    public boolean expandGroupWithAnimation(int groupPos) {
+    public void expandGroupWithAnimation(int groupPos) {
         boolean lastGroup = groupPos == adapter.getGroupCount() - 1;
         if (lastGroup) {
-            return expandGroup(groupPos, true);
+            expandGroup(groupPos, true);
+            return;
         }
 
         int groupFlatPos = getFlatListPosition(getPackedPositionForGroup(groupPos));
@@ -176,7 +174,8 @@ public class AnimatedExpandableListView extends ExpandableListView {
                     // We need to notify the adapter that the group was expanded
                     // without it's knowledge
                     adapter.notifyGroupExpanded(groupPos);
-                    return expandGroup(groupPos);
+                    expandGroup(groupPos);
+                    return;
                 }
             }
         }
@@ -185,17 +184,15 @@ public class AnimatedExpandableListView extends ExpandableListView {
         adapter.startExpandAnimation(groupPos, 0);
         // Finally call expandGroup (note that expandGroup will call
         // notifyDataSetChanged so we don't need to)
-        return expandGroup(groupPos);
+        expandGroup(groupPos);
     }
 
     /**
      * Collapses the given group with an animation.
      *
      * @param groupPos The position of the group to collapse
-     * @return Returns true if the group was collapsed. False if the group was
-     * already collapsed.
      */
-    public boolean collapseGroupWithAnimation(int groupPos) {
+    public void collapseGroupWithAnimation(int groupPos) {
         int groupFlatPos = getFlatListPosition(getPackedPositionForGroup(groupPos));
         if (groupFlatPos != -1) {
             int childIndex = groupFlatPos - getFirstVisiblePosition();
@@ -207,12 +204,14 @@ public class AnimatedExpandableListView extends ExpandableListView {
                     // we just collapse the group without an animation.
                     // This resolves the case where getChildView will not be
                     // called if the children of the group is not on screen
-                    return collapseGroup(groupPos);
+                    collapseGroup(groupPos);
+                    return;
                 }
             } else {
                 // If the group is offscreen, we can just collapse it without an
                 // animation...
-                return collapseGroup(groupPos);
+                collapseGroup(groupPos);
+                return;
             }
         }
 
@@ -233,7 +232,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
 
         // Force the listview to refresh it's views
         adapter.notifyDataSetChanged();
-        return isGroupExpanded(groupPos);
+        isGroupExpanded(groupPos);
     }
 
     private int getAnimationDuration() {
@@ -263,7 +262,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
      * adapters used with AnimatedExpandableListView MUST extend this class.
      */
     public static abstract class AnimatedExpandableListAdapter extends BaseExpandableListAdapter {
-        private SparseArray<GroupInfo> groupInfo = new SparseArray<GroupInfo>();
+        private final SparseArray<GroupInfo> groupInfo = new SparseArray<>();
         private AnimatedExpandableListView parent;
 
         private static final int STATE_IDLE = 0;
@@ -274,7 +273,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
             this.parent = parent;
         }
 
-        public int getRealChildType(int groupPosition, int childPosition) {
+        public int getRealChildType() {
             return 0;
         }
 
@@ -320,7 +319,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
         }
 
         /**
-         * Override {@link #getRealChildType(int, int)} instead.
+         * Override {@link #getRealChildType()} instead.
          */
         @Override
         public final int getChildType(int groupPosition, int childPosition) {
@@ -333,7 +332,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
                 // If we are not animating this group, then we will add 1 to
                 // the type it has so that no type id conflicts will occur
                 // unless getRealChildType() returns MAX_INT
-                return getRealChildType(groupPosition, childPosition) + 1;
+                return getRealChildType() + 1;
             }
         }
 
@@ -360,7 +359,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
 
             if (info.animating) {
                 // If this group is animating, return the a DummyView...
-                if (convertView instanceof DummyView == false) {
+                if (!(convertView instanceof DummyView)) {
                     convertView = new DummyView(parent.getContext());
                     convertView.setLayoutParams(new AbsListView.LayoutParams(LayoutParams.MATCH_PARENT, 0));
                 }
@@ -428,12 +427,8 @@ public class AnimatedExpandableListView extends ExpandableListView {
                     childView.measure(measureSpecW, childHeightSpec);
                     totalHeight += childView.getMeasuredHeight();
 
-                    if (totalHeight < clipHeight) {
-                        // we only need to draw enough views to fool the user...
-                        dummyView.addFakeView(childView);
-                    } else {
-                        dummyView.addFakeView(childView);
-
+                    dummyView.addFakeView(childView);
+                    if (totalHeight >= clipHeight) {
                         // if this group has too many views, we don't want to
                         // calculate the height of everything... just do a light
                         // approximation and break
@@ -519,7 +514,7 @@ public class AnimatedExpandableListView extends ExpandableListView {
     }
 
     private static class DummyView extends View {
-        private List<View> views = new ArrayList<View>();
+        private final List<View> views = new ArrayList<>();
         private Drawable divider;
         private int dividerWidth;
         private int dividerHeight;
@@ -591,10 +586,10 @@ public class AnimatedExpandableListView extends ExpandableListView {
     }
 
     private static class ExpandAnimation extends Animation {
-        private int baseHeight;
-        private int delta;
-        private View view;
-        private GroupInfo groupInfo;
+        private final int baseHeight;
+        private final int delta;
+        private final View view;
+        private final GroupInfo groupInfo;
 
         private ExpandAnimation(View v, int startHeight, int endHeight, GroupInfo info) {
             baseHeight = startHeight;
@@ -609,17 +604,15 @@ public class AnimatedExpandableListView extends ExpandableListView {
         @Override
         protected void applyTransformation(float interpolatedTime, Transformation t) {
             super.applyTransformation(interpolatedTime, t);
+            int val;
             if (interpolatedTime < 1.0f) {
-                int val = baseHeight + (int) (delta * interpolatedTime);
-                view.getLayoutParams().height = val;
-                groupInfo.dummyHeight = val;
-                view.requestLayout();
+                val = baseHeight + (int) (delta * interpolatedTime);
             } else {
-                int val = baseHeight + delta;
-                view.getLayoutParams().height = val;
-                groupInfo.dummyHeight = val;
-                view.requestLayout();
+                val = baseHeight + delta;
             }
+            view.getLayoutParams().height = val;
+            groupInfo.dummyHeight = val;
+            view.requestLayout();
         }
     }
 }

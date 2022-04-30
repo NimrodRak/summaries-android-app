@@ -13,7 +13,7 @@
         android:layout_height="40dp"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/courseOpen"
-        android:contentDescription="העתקת קישור"
+        android:contentDescription="@string/copy_link_tooltip"
         android:layout_marginHorizontal="10dp"
         android:background="@drawable/ic_link2"
         android:backgroundTint="?dividerColor"
@@ -31,11 +31,11 @@
 
         android:scaleType="fitCenter"
         android:background="@mipmap/ic_drive_trans_foreground"
-        android:contentDescription="פתיחה ב-Google Drive" />
+        android:contentDescription="@string/google_drive_tooltip" />
 
     <ImageButton
         android:id="@+id/courseSub"
-        android:contentDescription="הרשמה להתראות"
+        android:contentDescription="@string/sub_tooltip"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:scaleType="fitCenter"

@@ -38,9 +38,10 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     /**
      * build a notification and show it the user
-     * @param title title of notification
+     *
+     * @param title   title of notification
      * @param message message inside notification
-     * @param from field from FCM determining topic
+     * @param from    field from FCM determining topic
      */
     public void showNotification(String title, String message, String from) {
         // get topic from message
@@ -61,27 +62,29 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
                 break;
             }
         }
-        if (cur == null) {
+        if (cur == null && !topic.equals(MainActivity.TEST_TOPIC)) {
             return;
         }
-
-        // create intent to go to website
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(cur.getUrl()));
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(
-                this,
-                0,
-                intent,
-                PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
-
         // build the notification configuration
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 getApplicationContext(),
                 getString(R.string.default_notification_channel_id)
         ).setAutoCancel(true)
                 .setVibrate(new long[]{1000, 1000, 1000, 1000, 1000})
-                .setOnlyAlertOnce(true)
-                .setContentIntent(pendingIntent);
+                .setOnlyAlertOnce(true);
+        // if this isn't a test notification, add link to drive
+        if (!topic.equals(MainActivity.TEST_TOPIC)) {
+            // create intent to go to website
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(cur.getUrl()));
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            PendingIntent pendingIntent = PendingIntent.getActivity(
+                    this,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_IMMUTABLE);
+            builder.setContentIntent(pendingIntent);
+        }
+
 
         // build the actual notification
         builder = builder.setContentTitle(title)
